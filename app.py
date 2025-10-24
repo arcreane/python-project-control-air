@@ -1,9 +1,10 @@
 import sys
 
 from PySide6 import QtUiTools
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QListView
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QIODevice, Slot
+from matplotlib.backend_bases import button_press_handler, MouseEvent
 
 
 class MainWindow(QMainWindow):
@@ -52,6 +53,15 @@ class MainWindow(QMainWindow):
         """Slot appelé lorsque le bouton est cliqué"""
         QMessageBox.information(self, "Message", "Hello! Le bouton a été cliqué!")
         print("Hello from slot!")
+
+    @Slot()
+    def info(self):
+        """Informations avions"""
+
+
+
+
+
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()
