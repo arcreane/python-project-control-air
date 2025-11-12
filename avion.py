@@ -1,9 +1,10 @@
 
 class classavion():
-    def __init__(self, altitude, vitesse,cap):
+    def __init__(self, altitude, vitesse,cap, carburant):
         self.altitutde = altitude
         self.vitesse = vitesse
         self.cap = cap
+        self.carburant=carburant
 
 
 
