@@ -6,21 +6,47 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>922</width>
-    <height>802</height>
+    <width>416</width>
+    <height>219</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>40</y>
+      <width>79</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>90</y>
+      <width>79</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
+   </widget>
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>110</y>
-      <width>491</width>
-      <height>501</height>
+      <x>260</x>
+      <y>50</y>
+      <width>120</width>
+      <height>80</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -29,19 +55,6 @@
     <property name="frameShadow">
      <enum>QFrame::Shadow::Raised</enum>
     </property>
-    <widget class="QPushButton" name="pushButton">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>150</y>
-       <width>79</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>PushButton</string>
-     </property>
-    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -49,7 +62,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>922</width>
+     <width>416</width>
      <height>33</height>
     </rect>
    </property>
@@ -62,21 +75,37 @@
    <sender>pushButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
+   <slot>demo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>196</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>293</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
    <slot>affichage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>429</x>
-     <y>304</y>
+     <x>179</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
-     <x>460</x>
-     <y>400</y>
+     <x>207</x>
+     <y>109</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
-  <slot>demo()</slot>
   <slot>affichage()</slot>
+  <slot>demo()</slot>
  </slots>
 </ui>
