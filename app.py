@@ -1,15 +1,22 @@
 import sys
 
+
 from PySide6 import QtUiTools
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QListView
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QListView, QFrame
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QIODevice, Slot
 from matplotlib.backend_bases import button_press_handler, MouseEvent
+from avion import classavion
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+
+
+
+
 
         # Charger le fichier .ui directement dans cette instance
         loader = QtUiTools.QUiLoader()
@@ -38,25 +45,26 @@ class MainWindow(QMainWindow):
             loader.load(ui_file, self)
             ui_file.close()
 
-
-
-
-    @Slot()
-    def hello(self):
-        """Slot appelé lorsque le bouton est cliqué"""
-        QMessageBox.information(self, "Message", "Hello! Le bouton a été cliqué!")
-        print("Hello from slot!")
-
-
     @Slot()
     def demo(self):
         """Slot appelé lorsque le bouton est cliqué"""
         QMessageBox.information(self, "Message", "Hello! Le bouton a été cliqué!")
         print("Hello from slot!")
 
-    @Slot()
-    def info(self):
-        """Informations avions"""
+    def affichage(self):
+
+        height = QFrame.frameRect()
+        print(height)
+
+
+
+
+
+
+
+
+
+
 
 
 
