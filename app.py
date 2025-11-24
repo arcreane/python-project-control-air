@@ -6,17 +6,12 @@ from PySide6.QtGui import QPainter, QColor
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QPushButton, QListView, QFrame
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QIODevice, Slot
-from matplotlib.backend_bases import button_press_handler, MouseEvent
+
 import random as rnd
 
-class MainWindow(QMainWindow):
+class MainWindow():
     def __init__(self):
         super().__init__()
-
-
-
-
-
 
         # Charger le fichier .ui directement dans cette instance
         self.frame = QFrame(self)
@@ -24,7 +19,7 @@ class MainWindow(QMainWindow):
         loader.registerCustomWidget(MainWindow)
 
         # Important: charger avec self comme parent pour que les slots soient trouvés
-        ui_file_path = "demo.ui"
+        ui_file_path ="interface0.ui"
 
         # Méthode alternative: utiliser loadUi (si disponible)
         from PySide6.QtUiTools import loadUiType
@@ -129,7 +124,14 @@ class EspaceAerien:
 
 def main():
     app = QApplication(sys.argv)
-    window = MainWindow()
+
+    ui_file = QFile("interface0.ui")
+    ui_file.open(QFile.ReadOnly)
+
+    loader = QUiLoader()
+    window = loader.load(ui_file)
+    ui_file.close()
+
     window.show()
     sys.exit(app.exec())
 
