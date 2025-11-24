@@ -13,18 +13,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-
-
-
-
-
         # Charger le fichier .ui directement dans cette instance
         self.frame = QFrame(self)
         loader = QtUiTools.QUiLoader()
         loader.registerCustomWidget(MainWindow)
 
         # Important: charger avec self comme parent pour que les slots soient trouvés
-        ui_file_path = "demo.ui"
+        ui_file_path = "interface0.ui"
 
         # Méthode alternative: utiliser loadUi (si disponible)
         from PySide6.QtUiTools import loadUiType
@@ -129,7 +124,14 @@ class EspaceAerien:
 
 def main():
     app = QApplication(sys.argv)
-    window = MainWindow()
+
+    ui_file = QFile("interface0.ui")
+    ui_file.open(QFile.ReadOnly)
+
+    loader = QUiLoader()
+    window = loader.load(ui_file)
+    ui_file.close()
+
     window.show()
     sys.exit(app.exec())
 
