@@ -1,10 +1,10 @@
 import math
 import random
-
 from avion import Avion
 
 MIN_SPEED_KM_S = 0.16
 MAX_SPEED_KM_S = 0.31
+
 
 class EspaceAerien:
     def __init__(self, rayon_km):
@@ -15,49 +15,48 @@ class EspaceAerien:
             self.add_random_avion(f"RND{i + 1:02}")
 
     def add_random_avion(self, id_vol):
-        """Génère un nouvel avion avec des paramètres aléatoires dans la zone de radar."""
+        """Génère un nouvel avion SUR LE BORD avec un cap vers l'intérieur."""
 
-
-        r = self.rayon * random.uniform(0.1, 1.0)
+        r = self.rayon
         theta = random.uniform(0, 2 * math.pi)
 
         x = r * math.cos(theta)
         y = r * math.sin(theta)
 
+        angle_vers_centre = theta + math.pi
 
-        cap_deg = random.randint(0, 359)
+        variation = random.uniform(-math.pi / 4, math.pi / 4)
+        angle_final_rad = angle_vers_centre + variation
 
+        cap_deg = (90 - math.degrees(angle_final_rad)) % 360
 
         vitesse_km_s = random.uniform(MIN_SPEED_KM_S, MAX_SPEED_KM_S)
 
         avion = Avion(id_vol, x, y, cap_deg, vitesse_km_s)
         self.liste_avions.append(avion)
-        print(
-            f"Nouveau avion spawn: {avion.id_vol} à ({x:.1f}, {y:.1f}), Cap {cap_deg}°, Vitesse {vitesse_km_s:.2f} km/s.")
+        print(f"Spawn: {avion.id_vol} bordure ({x:.1f}, {y:.1f}), Cap entrant {cap_deg:.0f}°.")
 
     def avion_en_plus(self, avion):
         self.liste_avions.append(avion)
 
     def update_positions(self, delta_t_s):
-        """Déplace tous les avions et gère le remplacement des avions sortis de zone."""
+        """Déplace tous les avions et gère le remplacement."""
         avions_a_garder = []
 
         for avion in self.liste_avions:
             avion.move(delta_t_s)
 
-
             distance_au_centre = math.sqrt(avion.x ** 2 + avion.y ** 2)
 
-            if distance_au_centre <= self.rayon:
+            marge_sortie = self.rayon + 0.1
+
+            if distance_au_centre <= marge_sortie:
                 avions_a_garder.append(avion)
             else:
-                print(f"Avion {avion.id_vol} sorti de la zone à ({avion.x:.1f}, {avion.y:.1f}). Remplacement.")
-
+                print(f"Sortie: {avion.id_vol} à dist {distance_au_centre:.1f}km.")
 
         self.liste_avions = avions_a_garder
 
-
-        avions_remplacés = 3 - len(self.liste_avions)
-        for i in range(avions_remplacés):
-
+        nb_manquants = 3 - len(self.liste_avions)
+        for i in range(nb_manquants):
             self.add_random_avion(f"NEW{random.randint(100, 999)}")
