@@ -1,29 +1,24 @@
-import random as rnd
-from math import*
-from PySide6.QtWidgets import QFrame
+import math
+
+class Avion:
+    def __init__(self, id_vol, x, y, cap_deg, vitesse_km_s, est_en_urgence=False, est_selectionne=False):
+        self.id_vol = id_vol
+        self.x = x
+        self.y = y
+        self.cap_deg = cap_deg
+        self.vitesse_km_s = vitesse_km_s
+        self.est_en_urgence = est_en_urgence
+        self.est_selectionne = est_selectionne
+
+    def move(self, delta_t_s):
+
+        cap_rad = math.radians(90 - self.cap_deg)
+
+        distance = self.vitesse_km_s * delta_t_s
 
 
-
-class Avion():
-    def __init__(self, position_x, position_y, altitude, vitesse, cap, carburant):
-        self.x = position_x
-        self.y = position_y
-        self.altitude = altitude
-        self.vitesse = vitesse
-        self.cap = cap
-        self.carburant = carburant
-    def new_coords(self):
-        self.x = rnd.randint(self.cap[0], self.cap[1])
-        self.y = rnd.randint(self.cap[0], self.cap[1])
-        print(f"x : {self.x}")
-
-
-avion = Avion(30,30,2000,200,[0,360],1000)
-avion.new_coords()
-
-
-
-
+        self.x += distance * math.cos(cap_rad)
+        self.y += distance * math.sin(cap_rad)
 
 
 
