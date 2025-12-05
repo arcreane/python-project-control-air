@@ -3,8 +3,8 @@ from EspaceAerien import EspaceAerien
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QMessageBox, QFrame, QVBoxLayout, QPushButton, QSlider
 )
-from PySide6.QtGui import QPainter, QColor, QPen, QBrush
-from PySide6.QtCore import Slot, QRect, QFile, QIODevice, QTimer
+from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPixmap
+from PySide6.QtCore import Slot, QRect, QFile, QIODevice, QTimer, Qt
 from PySide6.QtUiTools import QUiLoader
 
 RAYON_ESPACE_AERIEN_KM = 7.5
@@ -17,11 +17,28 @@ class Radar(QFrame):
         super().__init__(parent)
         self.espace_aerien = espace_aerien if espace_aerien is not None else EspaceAerien(RAYON_ESPACE_AERIEN_KM)
         self.setMinimumSize(400, 400)
-        self.setStyleSheet("background-color: black;")
+        image_path = "Carte_radar.jpg"
+        self.background_pixmap = QPixmap(image_path)
+
+        if self.background_pixmap.isNull():
+            print(f"ATTENTION : Impossible de charger l'image : {image_path}")
+            print("Le fond restera gris par défaut.")
 
     def paintEvent(self, event):
         painter = QPainter(self)
         rect: QRect = self.rect()
+
+        if not self.background_pixmap.isNull():
+            scaled_bg = self.background_pixmap.scaled(
+                rect.size(),
+                Qt.AspectRatioMode.IgnoreAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+            painter.drawPixmap(0, 0, scaled_bg)
+        else:
+            painter.fillRect(rect, QColor(0, 0, 0))
+
+
         centre_x, centre_y = rect.width() / 2, rect.height() / 2
         echelle_px_par_km = min(rect.width(), rect.height()) / SIM_WIDTH_KM
 
