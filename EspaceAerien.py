@@ -26,12 +26,13 @@ class EspaceAerien:
         variation = random.uniform(-math.pi / 4, math.pi / 4)
         angle_final_rad = angle_vers_centre + variation
 
-        cap_deg = (90 - math.degrees(angle_final_rad)) % 360
+        cap_deg = int((90 - math.degrees(angle_final_rad)) % 360)
+
         vitesse_km_s = random.uniform(MIN_SPEED_KM_S, MAX_SPEED_KM_S)
 
         avion = Avion(id_vol, x, y, cap_deg, vitesse_km_s)
         self.liste_avions.append(avion)
-        print(f"Spawn: {avion.id_vol} bordure ({x:.1f}, {y:.1f}), Cap {cap_deg:.0f}°.")
+        print(f"Spawn: {avion.id_vol} bordure ({x:.1f}, {y:.1f}), Cap {cap_deg}°.")
 
     def update_positions(self, delta_t_s):
         """Déplace tous les avions et gère le remplacement."""
