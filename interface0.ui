@@ -73,7 +73,7 @@ border-color: rgb(0, 85, 127);</string>
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+     <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
       <widget class="QGroupBox" name="verticalGroupBox_2">
        <property name="minimumSize">
         <size>
@@ -228,7 +228,7 @@ background-color: rgb(255, 170, 0);</string>
               <string notr="true"/>
              </property>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </widget>
            </item>
@@ -241,7 +241,7 @@ background-color: rgb(255, 170, 0);</string>
      <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -266,10 +266,10 @@ background-color: rgb(255, 170, 0);</string>
      <string notr="true">background-color: rgb(85, 85, 127);</string>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::Shape::StyledPanel</enum>
     </property>
     <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
+     <enum>QFrame::Shadow::Raised</enum>
     </property>
    </widget>
   </widget>
@@ -279,12 +279,84 @@ background-color: rgb(255, 170, 0);</string>
      <x>0</x>
      <y>0</y>
      <width>1034</width>
-     <height>21</height>
+     <height>33</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>vol_descendre()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>884</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>vol_monter()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>884</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>vol_gauche()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>806</x>
+     <y>227</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>vol_droite()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>963</x>
+     <y>227</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>atterir()</slot>
+  <slot>vol_monter()</slot>
+  <slot>vol_gauche()</slot>
+  <slot>vol_droite()</slot>
+  <slot>vol_descendre()</slot>
+ </slots>
 </ui>
