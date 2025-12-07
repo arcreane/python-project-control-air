@@ -14,7 +14,7 @@ class Avion:
         self.est_en_urgence = est_en_urgence
         self.est_selectionne = est_selectionne
         self.altitude = random.choice(ALTITUDES_POSSIBLES)
-        self.carburant = 100.0
+        self.carburant = random.uniform(10.0, 70.0)
 
     def move(self, delta_t_s):
         cap_rad = math.radians(90 - self.cap_deg)
@@ -23,7 +23,8 @@ class Avion:
         self.x += distance * math.cos(cap_rad)
         self.y += distance * math.sin(cap_rad)
         self.carburant -= (0.05 * self.vitesse_km_s)
-        if self.carburant < 0: self.carburant = 0
+        if self.carburant < 0:
+            self.carburant = 0
 
     def monter_palier(self):
         try:

@@ -11,8 +11,9 @@ class EspaceAerien:
         self.liste_avions = []
         self.rayon = rayon_km
 
+
         for i in range(3):
-            self.add_random_avion(f"RND{i + 1:02}")
+            self.add_random_avion(f"START{i + 1}")
 
     def add_random_avion(self, id_vol):
         """Génère un nouvel avion SUR LE BORD avec un cap vers l'intérieur."""
@@ -35,8 +36,9 @@ class EspaceAerien:
         print(f"Spawn: {avion.id_vol} bordure ({x:.1f}, {y:.1f}), Cap {cap_deg}°.")
 
     def update_positions(self, delta_t_s):
-        """Déplace tous les avions et gère le remplacement."""
+        """Déplace les avions, supprime ceux qui sortent et les remplace."""
         avions_a_garder = []
+        nb_avions_sortis = 0
 
         for avion in self.liste_avions:
             avion.move(delta_t_s)
@@ -47,10 +49,10 @@ class EspaceAerien:
             if distance_au_centre <= marge_sortie:
                 avions_a_garder.append(avion)
             else:
-                print(f"Sortie: {avion.id_vol} à dist {distance_au_centre:.1f}km.")
+                print(f"Sortie: {avion.id_vol} (Remplacement immédiat)")
+                nb_avions_sortis += 1
 
         self.liste_avions = avions_a_garder
 
-        nb_manquants = 3 - len(self.liste_avions)
-        for i in range(nb_manquants):
-            self.add_random_avion(f"NEW{random.randint(100, 999)}")
+        for i in range(nb_avions_sortis):
+            self.add_random_avion(f"RND{random.randint(100, 999)}")

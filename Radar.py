@@ -9,7 +9,6 @@ SIM_WIDTH_KM = 2 * RAYON_ESPACE_AERIEN_KM
 
 
 class Radar(QFrame):
-
     avion_selectionne_signal = Signal(object)
 
     def __init__(self, parent=None, espace_aerien=None):
@@ -25,7 +24,7 @@ class Radar(QFrame):
             print(f"ATTENTION : Impossible de charger l'image : {image_path}")
 
     def mousePressEvent(self, event):
-        """Gère le clic souris pour sélectionner un avion."""
+        """Gère le clic souris avec priorité au plus proche."""
         if event.button() == Qt.LeftButton:
             click_pos = event.position()
             click_x = click_pos.x()
@@ -35,7 +34,9 @@ class Radar(QFrame):
             centre_x, centre_y = rect.width() / 2, rect.height() / 2
             echelle_px_par_km = min(rect.width(), rect.height()) / SIM_WIDTH_KM
 
-            avion_trouve = None
+            meilleur_avion = None
+            distance_min = 1000000
+            SEUIL_DETECTION_PX = 20
 
             for avion in self.espace_aerien.liste_avions:
                 ax_px = avion.x * echelle_px_par_km + centre_x
@@ -43,14 +44,18 @@ class Radar(QFrame):
 
                 dist = math.sqrt((click_x - ax_px) ** 2 + (click_y - ay_px) ** 2)
 
-                if dist < 20:
-                    avion_trouve = avion
+                if dist < SEUIL_DETECTION_PX:
+                    if dist < distance_min:
+                        distance_min = dist
+                        meilleur_avion = avion
+            for avion in self.espace_aerien.liste_avions:
+                if avion == meilleur_avion:
                     avion.est_selectionne = True
                 else:
                     avion.est_selectionne = False
 
             self.update()
-            self.avion_selectionne_signal.emit(avion_trouve)
+            self.avion_selectionne_signal.emit(meilleur_avion)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -92,7 +97,6 @@ class Radar(QFrame):
 
             painter.setPen(QPen(color, 2))
             painter.drawLine(int(x_px), int(y_px), int(x_end), int(y_end))
-
             painter.setBrush(QBrush(color))
             painter.drawEllipse(int(x_px) - 4, int(y_px) - 4, 8, 8)
 
