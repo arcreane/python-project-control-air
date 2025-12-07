@@ -151,6 +151,16 @@ border-color: rgb(0, 85, 127);</string>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
+      <widget class="QLabel" name="label_9">
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 170, 127);</string>
+       </property>
+       <property name="text">
+        <string>Score :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="label_8">
        <property name="styleSheet">
         <string notr="true">font: 15pt &quot;MS Shell Dlg 2&quot;;
