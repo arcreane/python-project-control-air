@@ -2,9 +2,10 @@ import sys
 from EspaceAerien import EspaceAerien
 from Radar import Radar
 from PySide6.QtWidgets import (
-    QApplication, QMessageBox, QFrame, QVBoxLayout, QPushButton, QSlider, QLabel
+    QApplication, QMessageBox, QFrame, QVBoxLayout, QPushButton, QSlider, QLabel, QListView
 )
-from PySide6.QtCore import Slot, QFile, QIODevice, QTimer
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QBrush
+from PySide6.QtCore import Slot, QFile, QIODevice, QTimer, Qt, QItemSelectionModel
 from PySide6.QtUiTools import QUiLoader
 
 RAYON_ESPACE_AERIEN_KM = 4
@@ -30,6 +31,8 @@ class AppLogic:
         self.window = loader.load(ui_file)
         ui_file.close()
 
+        self.list_model = QStandardItemModel()
+
         self._setup_ui_elements()
 
         self.timer_simu = QTimer()
@@ -40,7 +43,7 @@ class AppLogic:
         self.timer_spawn.timeout.connect(self.nouvel_avion_timer)
         self.timer_spawn.start(DELAI_SPAWN_MS)
 
-        print(f"Simulation démarrée. Nouvel avion toutes les {DELAI_SPAWN_MS / 1000}s.")
+        print(f"Simulation démarrée.")
 
     def _setup_ui_elements(self):
         radar_placeholder = self.window.findChild(QFrame, 'frame')
@@ -50,6 +53,11 @@ class AppLogic:
             layout = QVBoxLayout(radar_placeholder)
             layout.addWidget(self.radar_widget)
             radar_placeholder.setLayout(layout)
+
+        self.list_view = self.window.findChild(QListView, 'listView')
+        if self.list_view:
+            self.list_view.setModel(self.list_model)
+            self.list_view.clicked.connect(self.on_list_view_clicked)
 
         btn_atterir = self.window.findChild(QPushButton, 'pushButton_3')
         if btn_atterir: btn_atterir.clicked.connect(self.atterir)
@@ -80,7 +88,10 @@ class AppLogic:
     @Slot()
     def _update_simulation(self):
         self.espace_aerien.update_positions(TEMPS_INTERVALLE_S)
+
         self.radar_widget.update()
+
+        self._update_list_view()
 
         if self.avion_actif:
             if self.avion_actif in self.espace_aerien.liste_avions:
@@ -89,10 +100,68 @@ class AppLogic:
                 v_aff = int(self.avion_actif.vitesse_km_s * 1000)
                 self.lbl_vitesse.setText(f"Vitesse : {v_aff} km/h")
                 self.lbl_cap.setText(f"Cap : {self.avion_actif.cap_deg}°")
-                self.lbl_fuel.setText(f"Carburant : {self.avion_actif.carburant:.1f}%")
+
+                fuel_str = f"Carburant : {self.avion_actif.carburant:.1f}%"
+                self.lbl_fuel.setText(fuel_str)
+                if self.avion_actif.carburant < 5:
+                    self.lbl_fuel.setStyleSheet("color: red;")
+                elif self.avion_actif.carburant <= 10:
+                    self.lbl_fuel.setStyleSheet("color: orange;")
+                else:
+                    self.lbl_fuel.setStyleSheet("color: rgb(255, 170, 127);")
             else:
                 self.avion_actif = None
                 self._reset_labels()
+
+    def _update_list_view(self):
+        nb_avions = len(self.espace_aerien.liste_avions)
+        if self.list_model.rowCount() != nb_avions:
+            self.list_model.clear()
+            for _ in range(nb_avions):
+                item = QStandardItem()
+                item.setEditable(False)
+                self.list_model.appendRow(item)
+
+        sel_model = self.list_view.selectionModel()
+
+        for i, avion in enumerate(self.espace_aerien.liste_avions):
+            item = self.list_model.item(i)
+
+            new_text = f"{avion.id_vol} - {avion.altitude}m"
+            if item.text() != new_text:
+                item.setText(new_text)
+
+            item.setData(avion.id_vol, Qt.UserRole)
+
+            color = QColor(255, 255, 255)
+
+            if avion.altitude == 7000:
+                color = QColor(0, 255, 0)
+            elif avion.altitude == 8000:
+                color = QColor(0, 255, 127)
+            elif avion.altitude == 9000:
+                color = QColor(0, 255, 255)
+            elif avion.altitude == 10000:
+                color = QColor(0, 127, 255)
+            elif avion.altitude == 11000:
+                color = QColor(60, 60, 255)
+
+            if avion.carburant < 5:
+                color = QColor(255, 0, 0)
+            elif avion.carburant <= 10:
+                color = QColor(255, 165, 0)
+
+            if avion.est_selectionne:
+                color = QColor(255, 255, 0)
+                item.setBackground(QBrush(QColor(50, 50, 50)))
+
+                index_item = self.list_model.indexFromItem(item)
+                if not sel_model.isSelected(index_item):
+                    sel_model.select(index_item, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+            else:
+                item.setBackground(QBrush(Qt.NoBrush))
+
+            item.setForeground(QBrush(color))
 
     @Slot()
     def nouvel_avion_timer(self):
@@ -107,9 +176,31 @@ class AppLogic:
         self.lbl_vitesse.setText("Vitesse : --")
         self.lbl_cap.setText("Cap : --")
         self.lbl_fuel.setText("Carburant : --")
+        self.lbl_fuel.setStyleSheet("color: rgb(255, 170, 127);")
 
     @Slot(object)
     def on_avion_selected_from_radar(self, avion):
+        self._set_active_plane(avion)
+
+    @Slot(object)
+    def on_list_view_clicked(self, index):
+        id_vol_clique = self.list_model.itemFromIndex(index).data(Qt.UserRole)
+
+        avion_trouve = None
+        for av in self.espace_aerien.liste_avions:
+            if av.id_vol == id_vol_clique:
+                avion_trouve = av
+                break
+
+        if avion_trouve:
+            for av in self.espace_aerien.liste_avions:
+                av.est_selectionne = False
+
+            avion_trouve.est_selectionne = True
+            self._set_active_plane(avion_trouve)
+            self.radar_widget.update()
+
+    def _set_active_plane(self, avion):
         self.avion_actif = avion
         if avion:
             valeur_slider = int(avion.vitesse_km_s * 1000)
