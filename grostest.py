@@ -98,7 +98,7 @@ class AppLogic:
                 self.lbl_id.setText(f"Numéro : {self.avion_actif.id_vol}")
                 self.lbl_alt.setText(f"Altitude : {self.avion_actif.altitude} m")
                 v_aff = int(self.avion_actif.vitesse_km_s * 1000)
-                self.lbl_vitesse.setText(f"Vitesse : {v_aff} km/h")
+                self.lbl_vitesse.setText(f"Vitesse : {v_aff} m/s")
                 self.lbl_cap.setText(f"Cap : {self.avion_actif.cap_deg}°")
 
                 fuel_str = f"Carburant : {self.avion_actif.carburant:.1f}%"
