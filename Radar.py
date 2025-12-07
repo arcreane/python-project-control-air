@@ -1,3 +1,5 @@
+from fontTools.misc.textTools import caselessSort
+
 from EspaceAerien import EspaceAerien
 from PySide6.QtWidgets import QFrame
 from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPixmap
@@ -16,14 +18,10 @@ class Radar(QFrame):
         self.espace_aerien = espace_aerien if espace_aerien is not None else EspaceAerien(RAYON_ESPACE_AERIEN_KM)
         self.setMinimumSize(400, 400)
         self.setMouseTracking(True)
-
         image_path = "Carte_radar.jpg"
         self.background_pixmap = QPixmap(image_path)
 
-        if self.background_pixmap.isNull():
-            print(f"ATTENTION : Impossible de charger l'image : {image_path}")
-
-    def mousePressEvent(self, event):
+    def Clique_Souris(self, event):
         if event.button() == Qt.LeftButton:
             click_pos = event.position()
             click_x = click_pos.x()
@@ -67,23 +65,19 @@ class Radar(QFrame):
         centre_x, centre_y = rect.width() / 2, rect.height() / 2
         echelle_px_par_km = min(rect.width(), rect.height()) / SIM_WIDTH_KM
 
-        # Cercle
+
         painter.setPen(QPen(QColor(0, 50, 0), 1))
         painter.drawEllipse(centre_x - RAYON_ESPACE_AERIEN_KM * echelle_px_par_km,
                             centre_y - RAYON_ESPACE_AERIEN_KM * echelle_px_par_km,
                             SIM_WIDTH_KM * echelle_px_par_km,
                             SIM_WIDTH_KM * echelle_px_par_km)
 
-        # --- AÉROPORT (HAUT DROITE) ---
-        # Coordonnées Logiques (2km, 2km)
         airport_logic_x = 2.0
         airport_logic_y = 2.9
 
-        # Conversion en Pixels
         ap_px_x = int(airport_logic_x * echelle_px_par_km + centre_x)
         ap_px_y = int(-airport_logic_y * echelle_px_par_km + centre_y)
 
-        # Dessin Croix Blanche
         painter.setPen(QPen(QColor(255, 255, 255), 2))
         painter.drawLine(ap_px_x - 5, ap_px_y, ap_px_x + 5, ap_px_y)
         painter.drawLine(ap_px_x, ap_px_y - 5, ap_px_x, ap_px_y + 5)
@@ -91,19 +85,19 @@ class Radar(QFrame):
         for avion in self.espace_aerien.liste_avions:
             x_px = avion.x * echelle_px_par_km + centre_x
             y_px = -avion.y * echelle_px_par_km + centre_y
-
-            if avion.altitude == 7000:
-                color = QColor(0, 255, 0)
-            elif avion.altitude == 8000:
-                color = QColor(0, 255, 127)
-            elif avion.altitude == 9000:
-                color = QColor(0, 255, 255)
-            elif avion.altitude == 10000:
-                color = QColor(0, 127, 255)
-            elif avion.altitude == 11000:
-                color = QColor(60, 60, 255)
-            else:
-                color = QColor(0, 255, 0)
+            match avion.altitude:
+                case 7000:
+                    color = QColor(0, 255, 0)
+                case 8000:
+                    color = QColor(0, 255, 127)
+                case 9000:
+                    color = QColor(0, 255, 255)
+                case 10000:
+                    color = QColor(0, 127, 255)
+                case 11000:
+                    color = QColor(60, 60, 255)
+                case _:
+                    color = QColor(0, 255, 0)
 
             if avion.carburant < 5:
                 color = QColor(255, 0, 0)
