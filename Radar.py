@@ -24,7 +24,6 @@ class Radar(QFrame):
             print(f"ATTENTION : Impossible de charger l'image : {image_path}")
 
     def mousePressEvent(self, event):
-        """Gère le clic souris avec priorité au plus proche."""
         if event.button() == Qt.LeftButton:
             click_pos = event.position()
             click_x = click_pos.x()
@@ -41,13 +40,13 @@ class Radar(QFrame):
             for avion in self.espace_aerien.liste_avions:
                 ax_px = avion.x * echelle_px_par_km + centre_x
                 ay_px = -avion.y * echelle_px_par_km + centre_y
-
                 dist = math.sqrt((click_x - ax_px) ** 2 + (click_y - ay_px) ** 2)
 
                 if dist < SEUIL_DETECTION_PX:
                     if dist < distance_min:
                         distance_min = dist
                         meilleur_avion = avion
+
             for avion in self.espace_aerien.liste_avions:
                 if avion == meilleur_avion:
                     avion.est_selectionne = True
@@ -84,10 +83,28 @@ class Radar(QFrame):
             x_px = avion.x * echelle_px_par_km + centre_x
             y_px = -avion.y * echelle_px_par_km + centre_y
 
-            color = QColor(0, 255, 0)
+            if avion.altitude == 7000:
+                color = QColor(0, 255, 0)
+            elif avion.altitude == 8000:
+                color = QColor(0, 255, 127)
+            elif avion.altitude == 9000:
+                color = QColor(0, 255, 255)
+            elif avion.altitude == 10000:
+                color = QColor(0, 127, 255)
+            elif avion.altitude == 11000:
+                color = QColor(60, 60, 255)
+            else:
+                color = QColor(0, 255, 0)
+
+            if avion.carburant < 5:
+                color = QColor(255, 0, 0)
+            elif avion.carburant <= 10:
+                color = QColor(255, 165, 0)
+
             if avion.est_en_urgence:
                 color = QColor(255, 50, 50)
-            elif avion.est_selectionne:
+
+            if avion.est_selectionne:
                 color = QColor(255, 255, 0)
 
             cap_rad = math.radians(90 - avion.cap_deg)
@@ -97,6 +114,7 @@ class Radar(QFrame):
 
             painter.setPen(QPen(color, 2))
             painter.drawLine(int(x_px), int(y_px), int(x_end), int(y_end))
+
             painter.setBrush(QBrush(color))
             painter.drawEllipse(int(x_px) - 4, int(y_px) - 4, 8, 8)
 

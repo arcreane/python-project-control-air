@@ -13,6 +13,7 @@ class Avion:
         self.vitesse_km_s = vitesse_km_s
         self.est_en_urgence = est_en_urgence
         self.est_selectionne = est_selectionne
+
         self.altitude = random.choice(ALTITUDES_POSSIBLES)
         self.carburant = random.uniform(10.0, 70.0)
 
@@ -22,7 +23,9 @@ class Avion:
 
         self.x += distance * math.cos(cap_rad)
         self.y += distance * math.sin(cap_rad)
+
         self.carburant -= (0.05 * self.vitesse_km_s)
+
         if self.carburant < 0:
             self.carburant = 0
 
