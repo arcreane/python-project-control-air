@@ -18,31 +18,23 @@ class AppLogic:
     def __init__(self):
         self.espace_aerien = EspaceAerien(RAYON_ESPACE_AERIEN_KM)
         self.avion_actif = None
-
         self.compteur_vol = 10
-
         loader = QUiLoader()
         ui_file_path = "interface0.ui"
         ui_file = QFile(ui_file_path)
         if not ui_file.open(QIODevice.ReadOnly):
             print(f"Erreur UI Critique: Impossible d'ouvrir le fichier UI: {ui_file_path}")
             sys.exit(1)
-
         self.window = loader.load(ui_file)
         ui_file.close()
-
         self.list_model = QStandardItemModel()
-
         self._setup_ui_elements()
-
         self.timer_simu = QTimer()
         self.timer_simu.timeout.connect(self._update_simulation)
         self.timer_simu.start(TIMER_INTERVALLE_MS)
-
         self.timer_spawn = QTimer()
         self.timer_spawn.timeout.connect(self.nouvel_avion_timer)
         self.timer_spawn.start(DELAI_SPAWN_MS)
-
         print(f"Simulation démarrée.")
 
     def _setup_ui_elements(self):
@@ -53,32 +45,24 @@ class AppLogic:
             layout = QVBoxLayout(radar_placeholder)
             layout.addWidget(self.radar_widget)
             radar_placeholder.setLayout(layout)
-
         self.list_view = self.window.findChild(QListView, 'listView')
         if self.list_view:
             self.list_view.setModel(self.list_model)
             self.list_view.clicked.connect(self.on_list_view_clicked)
-
         btn_atterir = self.window.findChild(QPushButton, 'pushButton_3')
         if btn_atterir: btn_atterir.clicked.connect(self.atterir)
-
         btn_monter = self.window.findChild(QPushButton, 'pushButton_4')
         if btn_monter: btn_monter.clicked.connect(self.vol_monter)
-
         btn_descendre = self.window.findChild(QPushButton, 'pushButton_5')
         if btn_descendre: btn_descendre.clicked.connect(self.vol_descendre)
-
         btn_gauche = self.window.findChild(QPushButton, 'pushButton')
         if btn_gauche: btn_gauche.clicked.connect(self.vol_gauche)
-
         btn_droite = self.window.findChild(QPushButton, 'pushButton_2')
         if btn_droite: btn_droite.clicked.connect(self.vol_droite)
-
         self.slider_vitesse = self.window.findChild(QSlider, 'verticalSlider')
         if self.slider_vitesse:
             self.slider_vitesse.setRange(160, 310)
             self.slider_vitesse.valueChanged.connect(self.vitesse_changee)
-
         self.lbl_id = self.window.findChild(QLabel, 'label_5')
         self.lbl_alt = self.window.findChild(QLabel, 'label_4')
         self.lbl_vitesse = self.window.findChild(QLabel, 'label_3')
@@ -88,19 +72,15 @@ class AppLogic:
     @Slot()
     def _update_simulation(self):
         self.espace_aerien.update_positions(TEMPS_INTERVALLE_S)
-
         self.radar_widget.update()
-
         self._update_list_view()
-
         if self.avion_actif:
             if self.avion_actif in self.espace_aerien.liste_avions:
                 self.lbl_id.setText(f"Numéro : {self.avion_actif.id_vol}")
                 self.lbl_alt.setText(f"Altitude : {self.avion_actif.altitude} m")
                 v_aff = int(self.avion_actif.vitesse_km_s * 1000)
-                self.lbl_vitesse.setText(f"Vitesse : {v_aff} m/s")
+                self.lbl_vitesse.setText(f"Vitesse : {v_aff} km/h")
                 self.lbl_cap.setText(f"Cap : {self.avion_actif.cap_deg}°")
-
                 fuel_str = f"Carburant : {self.avion_actif.carburant:.1f}%"
                 self.lbl_fuel.setText(fuel_str)
                 if self.avion_actif.carburant < 5:
@@ -121,20 +101,15 @@ class AppLogic:
                 item = QStandardItem()
                 item.setEditable(False)
                 self.list_model.appendRow(item)
-
         sel_model = self.list_view.selectionModel()
-
         for i, avion in enumerate(self.espace_aerien.liste_avions):
             item = self.list_model.item(i)
-
-            new_text = f"{avion.id_vol} - {avion.altitude}m"
-            if item.text() != new_text:
-                item.setText(new_text)
-
+            status = "[ATT]" if avion.en_atterrissage else ""
+            new_text = f"{avion.id_vol} - {avion.altitude}m {status}"
+            if item.text() != new_text: item.setText(new_text)
             item.setData(avion.id_vol, Qt.UserRole)
 
             color = QColor(255, 255, 255)
-
             if avion.altitude == 7000:
                 color = QColor(0, 255, 0)
             elif avion.altitude == 8000:
@@ -145,7 +120,6 @@ class AppLogic:
                 color = QColor(0, 127, 255)
             elif avion.altitude == 11000:
                 color = QColor(60, 60, 255)
-
             if avion.carburant < 5:
                 color = QColor(255, 0, 0)
             elif avion.carburant <= 10:
@@ -154,13 +128,11 @@ class AppLogic:
             if avion.est_selectionne:
                 color = QColor(255, 255, 0)
                 item.setBackground(QBrush(QColor(50, 50, 50)))
-
                 index_item = self.list_model.indexFromItem(item)
                 if not sel_model.isSelected(index_item):
                     sel_model.select(index_item, QItemSelectionModel.Select | QItemSelectionModel.Rows)
             else:
                 item.setBackground(QBrush(Qt.NoBrush))
-
             item.setForeground(QBrush(color))
 
     @Slot()
@@ -185,17 +157,13 @@ class AppLogic:
     @Slot(object)
     def on_list_view_clicked(self, index):
         id_vol_clique = self.list_model.itemFromIndex(index).data(Qt.UserRole)
-
         avion_trouve = None
         for av in self.espace_aerien.liste_avions:
             if av.id_vol == id_vol_clique:
                 avion_trouve = av
                 break
-
         if avion_trouve:
-            for av in self.espace_aerien.liste_avions:
-                av.est_selectionne = False
-
+            for av in self.espace_aerien.liste_avions: av.est_selectionne = False
             avion_trouve.est_selectionne = True
             self._set_active_plane(avion_trouve)
             self.radar_widget.update()
@@ -220,23 +188,27 @@ class AppLogic:
 
     @Slot()
     def vol_gauche(self):
-        if self.avion_actif:
+        if self.avion_actif and not self.avion_actif.en_atterrissage:
             self.avion_actif.cap_deg = (self.avion_actif.cap_deg - 10) % 360
 
     @Slot()
     def vol_droite(self):
-        if self.avion_actif:
+        if self.avion_actif and not self.avion_actif.en_atterrissage:
             self.avion_actif.cap_deg = (self.avion_actif.cap_deg + 10) % 360
 
     @Slot(int)
     def vitesse_changee(self, value):
-        if self.avion_actif:
-            self.avion_actif.vitesse_km_s = value / 1000.0
+        if self.avion_actif: self.avion_actif.vitesse_km_s = value / 1000.0
 
     @Slot()
     def atterir(self):
         if self.avion_actif:
-            QMessageBox.information(self.window, "Info", f"Atterrissage demandé pour {self.avion_actif.id_vol}")
+            # COORDINATES CHANGEES ICI : (2.0, 2.0) = Haut Droite
+            self.avion_actif.entamer_atterrissage(2.0, 2.9)
+            print(f"Atterrissage initié vers PISTE (2,2) pour {self.avion_actif.id_vol}")
+            self.radar_widget.update()
+        else:
+            QMessageBox.warning(self.window, "Attention", "Sélectionnez un avion d'abord.")
 
     def show(self):
         self.window.show()

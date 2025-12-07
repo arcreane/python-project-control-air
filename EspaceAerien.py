@@ -11,12 +11,10 @@ class EspaceAerien:
         self.liste_avions = []
         self.rayon = rayon_km
 
-
         for i in range(3):
             self.add_random_avion(f"START{i + 1}")
 
     def add_random_avion(self, id_vol):
-        """Génère un nouvel avion SUR LE BORD avec un cap vers l'intérieur."""
         r = self.rayon
         theta = random.uniform(0, 2 * math.pi)
 
@@ -36,23 +34,33 @@ class EspaceAerien:
         print(f"Spawn: {avion.id_vol} bordure ({x:.1f}, {y:.1f}), Cap {cap_deg}°.")
 
     def update_positions(self, delta_t_s):
-        """Déplace les avions, supprime ceux qui sortent et les remplace."""
         avions_a_garder = []
         nb_avions_sortis = 0
+        nb_atterrissages_reussis = 0
 
         for avion in self.liste_avions:
             avion.move(delta_t_s)
 
+            if avion.en_atterrissage and avion.altitude <= 0:
+                print(f"Atterrissage REUSSI pour {avion.id_vol}")
+                nb_atterrissages_reussis += 1
+                continue
+
             distance_au_centre = math.sqrt(avion.x ** 2 + avion.y ** 2)
-            marge_sortie = self.rayon + 0.1
+            marge_sortie = self.rayon + 0.5
 
             if distance_au_centre <= marge_sortie:
                 avions_a_garder.append(avion)
             else:
-                print(f"Sortie: {avion.id_vol} (Remplacement immédiat)")
+                print(f"Sortie: {avion.id_vol} (Remplacement)")
                 nb_avions_sortis += 1
 
         self.liste_avions = avions_a_garder
 
         for i in range(nb_avions_sortis):
             self.add_random_avion(f"RND{random.randint(100, 999)}")
+
+        for i in range(nb_atterrissages_reussis):
+            # Spawn de 2 avions pour chaque atterrissage
+            self.add_random_avion(f"NEW{random.randint(1000, 4999)}")
+            self.add_random_avion(f"NEW{random.randint(5000, 9999)}")
